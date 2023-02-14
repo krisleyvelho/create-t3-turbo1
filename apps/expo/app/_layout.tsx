@@ -1,7 +1,8 @@
-import React from "react";
-import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import React from "react";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import BtnRoutes from "../src/components/BtnRoutes";
 
 import { TRPCProvider } from "../src/utils/api";
 
@@ -18,10 +19,11 @@ const RootLayout = () => {
         <Stack
           screenOptions={{
             headerStyle: {
-              backgroundColor: "#f472b6",
+              backgroundColor: "#afafaf",
             },
           }}
         />
+        <BtnRoutes />
         <StatusBar />
       </SafeAreaProvider>
     </TRPCProvider>
