@@ -3,7 +3,7 @@ import { createStringXY } from "ol/coordinate";
 import { useContext, useEffect, useState } from "react";
 import { MapContext } from "~/contexts/map";
 
-export function CustomMousePosition({}) {
+export function CustomMousePosition() {
   const { mapa } = useContext(MapContext);
   const [showMouseCoordinates, setShowMouseCoordinates] =
     useState<boolean>(false);

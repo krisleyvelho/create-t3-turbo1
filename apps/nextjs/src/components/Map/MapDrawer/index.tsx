@@ -28,16 +28,23 @@ export function MapDrawer() {
       "stroke-width": 3.5,
       "fill-color": "rgba(255, 255, 100, 1)",
       "circle-radius": 6,
-      "circle-fill-color": "rgba(255, 255, 100, 1)",
+      "circle-fill-color": "rgba(255, 0, 100, 1)",
     },
   });
 
   useEffect(() => {
     if (canDraw) {
+      drawInteraction.setProperties({ name: "drawInteraction" });
       mapa?.addInteraction(drawInteraction);
     } else {
       const arrayInteractions = mapa?.getInteractions().getArray();
-      if (arrayInteractions) {
+
+      arrayInteractions?.map((interaction) => {
+        if (interaction.getProperties()?.name === "drawInteraction") {
+          mapa?.removeInteraction(interaction);
+        }
+      });
+      /* if (arrayInteractions) {
         const eventDelete = arrayInteractions.findIndex(
           (interact) =>
             Object.getPrototypeOf(interact).constructor.name === "Draw",
@@ -47,7 +54,7 @@ export function MapDrawer() {
           arrayInteractions.splice(eventDelete);
           mapa?.renderSync();
         }
-      }
+      } */
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps

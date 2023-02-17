@@ -9,6 +9,8 @@ import {
   useState,
 } from "react";
 
+import { defaults as defaultControls, FullScreen } from "ol/control.js";
+
 type MapContextType = {
   mapa: Map | undefined;
   setMapa: (item: any) => void;
@@ -34,7 +36,7 @@ export const MapProvider = ({ children }: { children: ReactNode }) => {
           source: new OSM(),
         }),
       ],
-      controls: [],
+      controls: defaultControls().extend([new FullScreen()]),
       overlays: [],
     };
 

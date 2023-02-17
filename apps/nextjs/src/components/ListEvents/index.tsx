@@ -68,10 +68,9 @@ export function ListEvents({ setUpdateData, updateData }: ListEventsProps) {
         <Modal
           title={<HeaderLayout title="Teste" />}
           callbackCancel={() => setEventSelected(undefined)}
-          callbackOk={() => {
-            console.warn("aqui");
-            if (nameValue) mutate({ id: eventSelected.id, name: nameValue });
-          }}
+          callbackOk={() =>
+            nameValue && mutate({ id: eventSelected.id, name: nameValue })
+          }
           modalOpen={!!eventSelected}
         >
           <>
