@@ -5,7 +5,7 @@ import { FlatList, Text, View } from "react-native";
 import { api } from "../src/utils/api";
 
 export default function Index() {
-  const pageTitle = "Página Inicial";
+  const pageTitle = "Eventos";
   const { data: eventos } = api.evento.getAll.useQuery();
 
   return (
@@ -17,13 +17,27 @@ export default function Index() {
           statusBarHidden: true, */
         }}
       />
-
+      {!eventos?.length && (
+        <View className="w-100 flex justify-center bg-red-400 py-4 text-center">
+          <Text className="text-center text-white shadow-sm">
+            Não existem Eventos
+          </Text>
+        </View>
+      )}
       <FlatList
         data={eventos}
         renderItem={({ item }) => (
-          <Text className="w-100 mt-4 bg-blue-400 py-4 text-center">
-            {item.name}
-          </Text>
+          <View>
+            <Text className="w-100 mt-4 bg-blue-400 py-4 text-center">
+              {item.name}
+            </Text>
+            <Text className="w-100 mt-4 bg-blue-400 py-4 text-center">
+              {item.name}
+            </Text>
+            <Text className="w-100 mt-4 bg-blue-400 py-4 text-center">
+              {item.name}
+            </Text>
+          </View>
         )}
         keyExtractor={(item) => item.id}
       />
