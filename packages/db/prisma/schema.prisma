@@ -68,3 +68,11 @@ model Evento {
     id            String    @id @default(cuid())
     name          String
 }
+
+model PointMap {
+    id            String    @id @default(cuid())
+    name          String
+    zoom          Int
+    coordinateX   String
+    coordinateY   String
+}

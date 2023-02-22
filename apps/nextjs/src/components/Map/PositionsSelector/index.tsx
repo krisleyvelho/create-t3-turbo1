@@ -2,45 +2,63 @@ import { Feature, View } from "ol";
 import { Point } from "ol/geom";
 import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
-import { Icon, Style } from "ol/style.js";
-import { useContext, useEffect, useState } from "react";
-import { MapContext } from "~/contexts/map";
-
-type PredefinetionsType = {
-  zoom: number;
-  center: [number, number];
-  name: string;
-};
+import { Text } from "ol/style";
+import { Style } from "ol/style.js";
+import { useEffect, useState } from "react";
+import { useMapa } from "~/contexts/map";
+import { usePointers } from "~/contexts/pointer";
+import { RouterOutputs } from "~/utils/api";
 
 export function PositionSelector() {
-  const { mapa } = useContext(MapContext);
-  const predefinetions: PredefinetionsType[] = [
-    { zoom: 15, center: [-49.3002, -28.3588], name: "Casa" },
-    { zoom: 15, center: [-49.3544, -28.6806], name: "Trabalho" },
-  ];
-  const [localSelected, setLocalSelected] = useState<PredefinetionsType>();
+  const { mapa } = useMapa();
+  const { predefinetions } = usePointers();
+
+  const [localSelected, setLocalSelected] =
+    useState<RouterOutputs["pointerMap"]["byId"]>();
 
   useEffect(() => {
-    if (mapa) {
+    mapa?.setView(
+      new View({
+        projection: "EPSG:4326",
+        center: [
+          Number(localSelected?.coordinateX),
+          Number(localSelected?.coordinateY),
+        ],
+        zoom: localSelected?.zoom || 0,
+      }),
+    );
+  }, [localSelected, mapa]);
+
+  useEffect(() => {
+    if (predefinetions) {
       const view = new View({
         projection: "EPSG:4326",
-        center: localSelected?.center || [0, 0],
-        zoom: localSelected?.zoom || 0,
+        center: [0, 0],
+        zoom: 0,
       });
+      predefinetions.map((mark) => {
+        const center = [Number(mark.coordinateX), Number(mark.coordinateY)];
 
-      if (localSelected && localSelected.center) {
-        const iconStyle = new Style({
-          image: new Icon({
-            src: "https://picsum.photos/50/50",
-            rotateWithView: true,
+        const iconStyle = [
+          new Style({
+            text: new Text({
+              text: mark?.name,
+              font: "24px Calibri,sans-serif",
+              textAlign: "left",
+              padding: [20, 20, 20, 20],
+            }),
           }),
-        });
+        ];
 
         const pointer = new Feature({
-          geometry: new Point(localSelected?.center),
+          geometry: new Point(center),
         });
 
         pointer.setStyle(iconStyle);
+        if (mark) {
+          pointer.setProperties(mark);
+        }
+
         const vectorLayer = new VectorLayer({
           zIndex: 99,
           source: new VectorSource({
@@ -48,21 +66,24 @@ export function PositionSelector() {
           }),
         });
 
-        mapa.addLayer(vectorLayer);
-      }
-      mapa.setView(view);
+        mapa?.addLayer(vectorLayer);
+      });
+      mapa?.setView(view);
     }
-  }, [localSelected, mapa]);
+  }, [predefinetions]);
+
+  if (!predefinetions) return null;
 
   return (
     <div className="flex flex-col">
       <span>Selecione um local pré-definido</span>
 
       <select
-        onChange={(e) =>
-          e.target.value &&
-          setLocalSelected(predefinetions[Number(e.target?.value)])
-        }
+        onChange={(e) => {
+          const position = e.target.value && Number(e.target.value);
+
+          if (position) setLocalSelected(predefinetions[position]);
+        }}
         defaultValue={-1}
       >
         {predefinetions.map((local, index) => (

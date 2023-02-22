@@ -17,6 +17,7 @@
     "@acme/db": "*",
     "@acme/tailwind-config": "*",
     "@radix-ui/react-dialog": "^1.0.2",
+    "@radix-ui/react-hover-card": "^1.0.3",
     "@radix-ui/react-icons": "^1.1.1",
     "@radix-ui/react-tabs": "^1.0.2",
     "@tanstack/react-query": "^4.23.0",

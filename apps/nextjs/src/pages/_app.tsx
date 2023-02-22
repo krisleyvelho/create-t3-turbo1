@@ -4,6 +4,7 @@ import type { AppType } from "next/app";
 import "../styles/globals.css";
 
 import { MapProvider } from "~/contexts/map";
+import { PointersProvider } from "~/contexts/pointer";
 import { api } from "~/utils/api";
 
 const MyApp: AppType<{ session: Session | null }> = ({
@@ -13,7 +14,9 @@ const MyApp: AppType<{ session: Session | null }> = ({
   return (
     <SessionProvider session={session}>
       <MapProvider>
-        <Component {...pageProps} />
+        <PointersProvider>
+          <Component {...pageProps} />
+        </PointersProvider>
       </MapProvider>
     </SessionProvider>
   );

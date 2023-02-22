@@ -1,10 +1,10 @@
 import MousePosition from "ol/control/MousePosition.js";
 import { createStringXY } from "ol/coordinate";
-import { useContext, useEffect, useState } from "react";
-import { MapContext } from "~/contexts/map";
+import { useEffect, useState } from "react";
+import { useMapa } from "~/contexts/map";
 
 export function CustomMousePosition() {
-  const { mapa } = useContext(MapContext);
+  const { mapa } = useMapa();
   const [showMouseCoordinates, setShowMouseCoordinates] =
     useState<boolean>(false);
 
