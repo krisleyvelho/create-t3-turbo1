@@ -2,7 +2,7 @@ import { Feature, View } from "ol";
 import { Point } from "ol/geom";
 import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
-import { Text } from "ol/style";
+import { Fill, Text } from "ol/style";
 import { Style } from "ol/style.js";
 import { useEffect, useState } from "react";
 import { useMapa } from "~/contexts/map";
@@ -17,25 +17,23 @@ export function PositionSelector() {
     useState<RouterOutputs["pointerMap"]["byId"]>();
 
   useEffect(() => {
-    mapa?.setView(
-      new View({
-        projection: "EPSG:4326",
-        center: [
-          Number(localSelected?.coordinateX),
-          Number(localSelected?.coordinateY),
-        ],
-        zoom: localSelected?.zoom || 0,
-      }),
-    );
+    if (localSelected) {
+      mapa?.setView(
+        new View({
+          projection: "EPSG:4326",
+          center: [
+            Number(localSelected?.coordinateX),
+            Number(localSelected?.coordinateY),
+          ],
+          zoom: localSelected?.zoom,
+        }),
+      );
+    }
   }, [localSelected, mapa]);
 
   useEffect(() => {
     if (predefinetions) {
-      const view = new View({
-        projection: "EPSG:4326",
-        center: [0, 0],
-        zoom: 0,
-      });
+      const pointers: Feature[] = [];
       predefinetions.map((mark) => {
         const center = [Number(mark.coordinateX), Number(mark.coordinateY)];
 
@@ -45,7 +43,10 @@ export function PositionSelector() {
               text: mark?.name,
               font: "24px Calibri,sans-serif",
               textAlign: "left",
-              padding: [20, 20, 20, 20],
+              backgroundFill: new Fill({
+                color: "#0000001a",
+              }),
+              scale: 1,
             }),
           }),
         ];
@@ -55,20 +56,18 @@ export function PositionSelector() {
         });
 
         pointer.setStyle(iconStyle);
-        if (mark) {
-          pointer.setProperties(mark);
-        }
+        pointer.setProperties(mark);
 
-        const vectorLayer = new VectorLayer({
-          zIndex: 99,
-          source: new VectorSource({
-            features: [pointer],
-          }),
-        });
-
-        mapa?.addLayer(vectorLayer);
+        pointers.push(pointer);
       });
-      mapa?.setView(view);
+      const vectorLayer = new VectorLayer({
+        zIndex: 99,
+        source: new VectorSource({
+          features: pointers,
+        }),
+      });
+
+      mapa?.addLayer(vectorLayer);
     }
   }, [predefinetions]);
 
@@ -80,18 +79,18 @@ export function PositionSelector() {
 
       <select
         onChange={(e) => {
-          const position = e.target.value && Number(e.target.value);
-
-          if (position) setLocalSelected(predefinetions[position]);
+          const selected = predefinetions.find(
+            (item) => item.id === e.target.value,
+          );
+          setLocalSelected(selected);
         }}
-        defaultValue={-1}
       >
+        <option value={-1}>Selecione...</option>
         {predefinetions.map((local, index) => (
-          <option value={index} key={index}>
+          <option value={local.id} key={index}>
             {local.name}
           </option>
         ))}
-        <option value={-1}>Selecione...</option>
       </select>
     </div>
   );
