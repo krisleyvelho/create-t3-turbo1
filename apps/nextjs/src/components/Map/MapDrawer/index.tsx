@@ -93,6 +93,7 @@ export function MapDrawer() {
         mapa?.removeInteraction(interaction);
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [canDraw, mapa]);
 
   return (

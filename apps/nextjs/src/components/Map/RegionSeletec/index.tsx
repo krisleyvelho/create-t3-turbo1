@@ -6,7 +6,7 @@ import { Fill, Style } from "ol/style.js";
 import { useEffect, useState } from "react";
 import { useMapa } from "~/contexts/map";
 
-export default function RegionSelect() {
+export function RegionSelect() {
   const { mapa } = useMapa();
   const [texto, setTexto] = useState("");
   const [showEcoRegions, setShowEcoRegions] = useState<boolean>(false);

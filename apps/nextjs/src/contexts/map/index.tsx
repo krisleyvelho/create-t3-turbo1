@@ -11,7 +11,6 @@ import {
 
 type MapContextType = {
   mapa: Map | undefined;
-  setMapa: (item: any) => void;
 };
 
 export const MapContext = createContext<MapContextType>({} as MapContextType);
@@ -37,11 +36,7 @@ export const MapProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => mountMapa(), []);
 
-  return (
-    <MapContext.Provider value={{ mapa, setMapa }}>
-      {children}
-    </MapContext.Provider>
-  );
+  return <MapContext.Provider value={{ mapa }}>{children}</MapContext.Provider>;
 };
 
 export function useMapa() {

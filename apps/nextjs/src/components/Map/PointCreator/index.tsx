@@ -1,8 +1,5 @@
 import * as Tabs from "@radix-ui/react-tabs";
-import { Feature } from "ol";
 import { Coordinate } from "ol/coordinate";
-import { Point } from "ol/geom";
-import { Style, Text } from "ol/style";
 import { useState } from "react";
 import { useMapa } from "~/contexts/map";
 import { usePointers } from "~/contexts/pointer";
@@ -10,7 +7,7 @@ import { api, RouterInputs } from "~/utils/api";
 
 type PointCreatorProps = {
   coords: Coordinate;
-  setCoords: (item: Coordinate | undefined) => void;
+  setCoords: (item: Coordinate | null) => void;
 };
 
 export function PointCreator({ coords, setCoords }: PointCreatorProps) {
@@ -20,28 +17,10 @@ export function PointCreator({ coords, setCoords }: PointCreatorProps) {
     RouterInputs["pointerMap"]["create"]
   >({} as RouterInputs["pointerMap"]["create"]);
 
-  const iconStyle = [
-    new Style({
-      text: new Text({
-        text: formValues?.name,
-        font: "36px Calibri,sans-serif",
-        padding: [2, 2, 2, 2],
-        textAlign: "left",
-        offsetX: 15,
-      }),
-    }),
-  ];
-
-  const pointer = new Feature({
-    geometry: new Point(coords),
-  });
-
-  pointer.setStyle(iconStyle);
-
   const { mutate } = api.pointerMap.create.useMutation({
     onSuccess: () => {
       refetch();
-      setCoords(undefined);
+      setCoords(null);
     },
   });
   if (!mapa) return null;
@@ -101,12 +80,13 @@ export function PointCreator({ coords, setCoords }: PointCreatorProps) {
         onChange={(e) =>
           setFormValues({ ...formValues, zoom: Number(e.target.value) })
         }
+        min={0}
       />
 
       <div className="mt-3 flex justify-end">
         <button
           className="bg-green4 text-green11 hover:bg-green5 focus:shadow-green7 inline-flex h-[35px] cursor-default items-center justify-center rounded px-[15px] text-[15px] font-medium leading-none outline-none focus:shadow-[0_0_0_2px]"
-          onClick={() => setCoords(undefined)}
+          onClick={() => setCoords(null)}
         >
           Cancelar
         </button>

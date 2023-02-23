@@ -20,7 +20,6 @@ export function PositionSelector() {
     if (localSelected) {
       mapa?.setView(
         new View({
-          projection: "EPSG:4326",
           center: [
             Number(localSelected?.coordinateX),
             Number(localSelected?.coordinateY),
@@ -33,7 +32,14 @@ export function PositionSelector() {
 
   useEffect(() => {
     if (predefinetions) {
+      const layerCached = mapa
+        ?.getLayers()
+        .getArray()
+        .find((layer) => layer.getProperties()?.id === "pointers");
+      layerCached && mapa?.removeLayer(layerCached);
+
       const pointers: Feature[] = [];
+
       predefinetions.map((mark) => {
         const center = [Number(mark.coordinateX), Number(mark.coordinateY)];
 
@@ -65,11 +71,12 @@ export function PositionSelector() {
         source: new VectorSource({
           features: pointers,
         }),
+        properties: { id: "pointers" },
       });
 
       mapa?.addLayer(vectorLayer);
     }
-  }, [predefinetions]);
+  }, [mapa, predefinetions]);
 
   if (!predefinetions) return null;
 

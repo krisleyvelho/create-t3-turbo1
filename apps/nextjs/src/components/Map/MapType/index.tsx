@@ -73,8 +73,10 @@ export function MapType() {
           break;
       }
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapOption, mapa]);
+
   return (
     <div>
       <select
