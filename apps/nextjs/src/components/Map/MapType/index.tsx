@@ -37,6 +37,7 @@ export function MapType() {
   const rasterEcologico = new VectorLayer({
     background: "#1a2b39",
     source: new VectorSource({
+      
       url: "https://openlayers.org/data/vector/ecoregions.json",
       format: new GeoJSON(),
     }),
@@ -78,10 +79,12 @@ export function MapType() {
   }, [mapOption, mapa]);
 
   return (
-    <div>
+    <div className="flex flex-col">
+      <span>Tipo do mapa</span>
       <select
         onChange={(e) => setMapOption(e.target?.value)}
         defaultValue={"default"}
+        className="bg-transparent outline-none"
       >
         <option value="default">Default</option>
         <option value="politic">Politico</option>

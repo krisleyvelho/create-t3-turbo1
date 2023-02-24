@@ -5,6 +5,7 @@ import { api } from "~/utils/api";
 
 import { Pencil2Icon, TrashIcon } from "@radix-ui/react-icons";
 import { Overlay } from "ol";
+import { FormPointer } from "../FormPointer";
 
 type DataPoint = { [x: string]: any };
 
@@ -12,6 +13,7 @@ export function CardMap() {
   const { mapa } = useMapa();
   const { refetch } = usePointers();
   const [dataPoint, setDataPoint] = useState<DataPoint | null>();
+  const [showEditPoint, setShowEditPoint] = useState<boolean>(false);
   const hoverCardRef = useRef<HTMLDivElement>(null);
 
   const { mutate } = api.pointerMap.delete.useMutation({
@@ -64,9 +66,14 @@ export function CardMap() {
     }
   }, [dataPoint, mapa]);
 
+  function disableForm() {
+    setShowEditPoint(false);
+    setDataPoint(null);
+  }
+
   return (
     <div ref={hoverCardRef} className="absolute mt-5 min-w-[300px]">
-      {dataPoint && (
+      {dataPoint && !showEditPoint && (
         <div className="flex justify-between rounded-md bg-white p-5">
           <div>
             <span>{dataPoint?.name || ""}</span>
@@ -75,11 +82,14 @@ export function CardMap() {
             <button onClick={() => mutate(dataPoint.id)}>
               <TrashIcon width={25} height={30} />
             </button>
-            <button>
+            <button onClick={() => setShowEditPoint(true)}>
               <Pencil2Icon width={25} height={30} />
             </button>
           </div>
         </div>
+      )}
+      {showEditPoint && dataPoint && (
+        <FormPointer onCancel={disableForm} initialValue={dataPoint} />
       )}
     </div>
   );

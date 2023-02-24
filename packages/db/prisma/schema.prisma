@@ -76,3 +76,8 @@ model PointMap {
     coordinateX   String
     coordinateY   String
 }
+
+model PolygonItens {
+    id            String    @id @default(cuid())
+    location      String[]
+}

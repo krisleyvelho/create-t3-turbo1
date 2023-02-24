@@ -9,10 +9,8 @@ const Home: NextPage = () => {
 
   return (
     <LayoutBase title="Pagina inicial">
-      <>
-        <ListEvents updateData={updateData} setUpdateData={setUpdateData} />
-        <FormNewEvent setUpdateData={setUpdateData} />
-      </>
+      <ListEvents updateData={updateData} setUpdateData={setUpdateData} />
+      <FormNewEvent setUpdateData={setUpdateData} />
     </LayoutBase>
   );
 };

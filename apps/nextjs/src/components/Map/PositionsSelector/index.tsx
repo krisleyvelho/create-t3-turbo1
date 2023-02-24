@@ -91,6 +91,7 @@ export function PositionSelector() {
           );
           setLocalSelected(selected);
         }}
+        className="bg-transparent outline-none"
       >
         <option value={-1}>Selecione...</option>
         {predefinetions.map((local, index) => (
