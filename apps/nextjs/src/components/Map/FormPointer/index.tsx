@@ -5,7 +5,7 @@ import { api, RouterInputs } from "~/utils/api";
 
 type FormPointer = {
   onCancel: () => void;
-  conditionalOk: (item: any) => void;
+  conditionalOk?: (item: any) => void;
   initialValue?: { [x: string]: any };
 };
 
@@ -31,7 +31,7 @@ export function FormPointer({
   });
 
   function handleOK() {
-    if (!initialValue?.name) {
+    if (!initialValue?.name && conditionalOk) {
       return conditionalOk(formValues);
     }
     if (initialValue?.id) {

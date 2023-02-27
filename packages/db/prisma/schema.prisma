@@ -79,5 +79,6 @@ model PointMap {
 
 model PolygonItens {
     id            String    @id @default(cuid())
-    location      String[]
+    name          String
+    location      String    @db.Text()
 }

@@ -30,15 +30,10 @@ export function CardMap() {
         ?.getProperties();
 
       if (properties?.zoom) {
-        if (evt.coordinate[0] && evt.coordinate[1]) {
-          const data: DataPoint = {
-            ...properties,
-            coordinateX: evt.coordinate[0],
-            coordinateY: evt.coordinate[1],
-          };
-          setDataPoint(dataPoint ? null : data);
-        }
+        setDataPoint(properties);
       }
+    } else {
+      dataPoint && setDataPoint(undefined);
     }
   });
 

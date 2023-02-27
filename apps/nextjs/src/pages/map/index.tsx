@@ -7,7 +7,6 @@ import { MapType } from "~/components/Map/MapType";
 import { CustomMousePosition } from "~/components/Map/MousePosition";
 import { PointCreator } from "~/components/Map/PointCreator";
 import { PositionSelector } from "~/components/Map/PositionsSelector";
-import { RegionSelect } from "~/components/Map/RegionSeletec";
 import { SaveGeometry } from "~/components/Map/SaveGeometry";
 import { CustomRightClick } from "~/components/RighClick";
 
@@ -46,7 +45,6 @@ export default function Index() {
           <MapDrawer />
           <CustomMousePosition />
           <PositionSelector />
-          <RegionSelect />
           <CardMap />
           <SaveGeometry />
           {coordsClicked && (

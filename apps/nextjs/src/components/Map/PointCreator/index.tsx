@@ -23,7 +23,6 @@ export function PointCreator({ coords, setCoords }: PointCreatorProps) {
 
   function generatePoint(data: RouterInputs["pointerMap"]["create"]) {
     if (!mapa) return;
-    console.log("aquo");
 
     mutate(data);
   }

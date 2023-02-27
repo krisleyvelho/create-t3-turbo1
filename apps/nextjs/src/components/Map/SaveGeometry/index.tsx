@@ -1,39 +1,65 @@
-import { Feature } from "ol";
+import { Feature, Overlay } from "ol";
+import { FeatureLike } from "ol/Feature";
 import { MultiPoint, Polygon } from "ol/geom";
 import { Draw } from "ol/interaction";
 import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
-import { Fill, Stroke, Style } from "ol/style";
+import { Fill, Stroke, Style, Text } from "ol/style";
 import CircleStyle from "ol/style/Circle";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMapa } from "~/contexts/map";
-import { api } from "~/utils/api";
+import { api, RouterOutputs } from "~/utils/api";
+import { FormVector } from "../FormVector";
+
+type dataType = NonNullable<RouterOutputs["polygonMap"]["byId"]>;
 
 export function SaveGeometry() {
   const { mapa } = useMapa();
   const [canDraw, setCanDraw] = useState<boolean>(false);
   const [showGeometry, setShowGeometry] = useState<boolean>(false);
+  const [coordinatesVector, setCoordinatesVector] = useState();
+  const [data, setData] = useState<dataType[]>();
+  const cardRef = useRef<HTMLDivElement>(null);
 
-  const { data: dbTeste } = api.polygonMap.all.useQuery();
+  const { data: dbTeste, refetch } = api.polygonMap.all.useQuery();
 
-  console.log(dbTeste);
+  function unionVector() {
+    const data: dataType[] = [];
+    function createVector(array: number[][]) {
+      const parVector: number[][] = [];
 
-  const staticCoordnate = [
-    [
-      [12977816.497878488, -5948165.894860974],
-      [5677794.71782184, -3935402.688014077],
-      [5647753.475928601, -6398784.523259532],
-      [9823486.09908858, -7630475.440882258],
-      [12977816.497878488, -5948165.894860974],
-    ],
+      const data = array[0];
+      if (data) {
+        data.map((item, index) => {
+          const indexPar = (index + 1) % 2 === 0;
 
-    [
-      [-2e6, -1e6],
-      [-1e6, 1e6],
-      [0, -1e6],
-      [-2e6, -1e6],
-    ],
-  ];
+          if (indexPar) {
+            parVector.push([data[index - 1] as number, item]);
+          }
+        });
+      }
+      return parVector;
+    }
+
+    dbTeste?.map((itemVector) => {
+      const parsedJsonLocation = JSON.parse(itemVector.location) as number[][];
+
+      if (parsedJsonLocation) {
+        const newObjectVector = {
+          ...itemVector,
+          location: createVector(parsedJsonLocation),
+        };
+        data.push(newObjectVector);
+      }
+    });
+    setData(data);
+  }
+
+  useEffect(() => {
+    if (dbTeste) {
+      unionVector();
+    }
+  }, [dbTeste]);
 
   function mountDrawer() {
     const sourceDraw = new VectorSource();
@@ -64,9 +90,10 @@ export function SaveGeometry() {
             }),
           }),
 
-          geometry: function (feature) {
+          geometry: function (feature: FeatureLike) {
+            setCoordinatesVector(feature.getGeometry()?.flatCoordinates);
+
             const coordinates = feature?.getGeometry()?.getCoordinates()[0];
-            console.log(coordinates);
 
             return new MultiPoint(coordinates);
           },
@@ -83,62 +110,61 @@ export function SaveGeometry() {
     mapa?.addInteraction(draw);
   }
 
-  function unMountDrawer() {
-    const vector = mapa
-      ?.getLayers()
-      .getArray()
-      .find((layer) => layer.getProperties()?.name === "drawerVector");
-    const interaction = mapa
-      ?.getInteractions()
-      .getArray()
-      .find((interaction) => interaction.getProperties()?.name === "drawer");
-
-    if (vector) mapa?.removeLayer(vector);
-    if (interaction) mapa?.removeInteraction(interaction);
-  }
-
   function mountLayers() {
     const features: Feature[] = [];
+    data?.map((item) => {
+      const featureStyle = new Style({
+        text: new Text({
+          text: item.name,
+          font: "24px Calibri,sans-serif",
+          textAlign: "left",
+          backgroundFill: new Fill({
+            color: "#0000001a",
+          }),
+          scale: 1,
+        }),
+        stroke: new Stroke({
+          color: "blue",
+          width: 3,
+        }),
+        fill: new Fill({
+          color: "rgba(0, 0, 255, 0.1)",
+        }),
+      });
 
-    staticCoordnate.map((location) =>
-      features.push(new Feature(new Polygon([location]))),
-    );
-
-    const styles = new Style({
-      stroke: new Stroke({
-        color: "blue",
-        width: 3,
-      }),
-      fill: new Fill({
-        color: "rgba(0, 0, 255, 0.1)",
-      }),
+      const polygon: Polygon = new Polygon([item.location]);
+      polygon.setProperties({ name: item.name });
+      const feature = new Feature(polygon);
+      feature.setStyle(featureStyle);
+      features.push(feature);
     });
 
-    const source = new VectorSource({
-      features: features,
-    });
+    const source = new VectorSource({ features });
 
     const layer = new VectorLayer({
       source: source,
-      style: styles,
       properties: { name: "layersVector" },
     });
     mapa?.addLayer(layer);
   }
 
-  function unMountLayers() {
-    const finded = mapa
-      ?.getLayers()
-      .getArray()
-      .find((item) => item.getProperties()?.name === "layersVector");
+  useEffect(() => {
+    if (cardRef.current && coordinatesVector) {
+      const overlay = new Overlay({
+        element: cardRef.current,
+      });
 
-    if (finded) mapa?.removeLayer(finded);
-  }
+      overlay.setPosition([coordinatesVector[0], coordinatesVector[1]]);
+
+      mapa?.addOverlay(overlay);
+    }
+  }, [coordinatesVector, mapa]);
 
   useEffect(() => {
-    mountLayers();
-    /* mountDrawer(); */
-  }, []);
+    if (data) {
+      mountLayers();
+    }
+  }, [data]);
 
   useEffect(() => {
     const finded = mapa
@@ -149,7 +175,7 @@ export function SaveGeometry() {
     if (!finded) return;
 
     finded.setVisible(showGeometry);
-  }, [mapa, showGeometry]);
+  }, [mapa, showGeometry, data]);
 
   useEffect(() => {
     const vector = mapa
@@ -157,8 +183,26 @@ export function SaveGeometry() {
       .getArray()
       .find((layer) => layer.getProperties()?.name === "drawerVector");
 
+    if (canDraw && !vector) mountDrawer();
+
     if (vector) vector.setVisible(canDraw);
+
+    if (!canDraw) {
+      const interaction = mapa
+        ?.getInteractions()
+        .getArray()
+        .find((interaction) => interaction.getProperties()?.name === "drawer");
+      interaction && mapa?.removeInteraction(interaction);
+    }
   }, [canDraw, mapa]);
+
+  function onSuccessRecord(operation?: string) {
+    setCoordinatesVector(undefined);
+    setCanDraw(false);
+    if (!operation) {
+      refetch();
+    }
+  }
 
   return (
     <div className="flex flex-col">
@@ -168,6 +212,15 @@ export function SaveGeometry() {
       <button onClick={() => setShowGeometry(!showGeometry)}>{`${
         showGeometry ? "Esconder" : "Mostrar"
       } Geometrias`}</button>
+      <div ref={cardRef} className="absolute mt-5 min-w-[300px]">
+        {coordinatesVector && (
+          <FormVector
+            inputs={[{ key: "name", name: "Nome", type: "text" }]}
+            coordinatesVector={coordinatesVector}
+            onSuccessRecord={onSuccessRecord}
+          />
+        )}
+      </div>
     </div>
   );
 }

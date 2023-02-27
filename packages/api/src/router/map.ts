@@ -49,4 +49,14 @@ export const polygonMapRouter = createTRPCRouter({
   byId: publicProcedure.input(z.string()).query(({ ctx, input }) => {
     return ctx.prisma.polygonItens.findFirst({ where: { id: input } });
   }),
+  create: publicProcedure
+    .input(
+      z.object({
+        name: z.string().min(1),
+        location: z.string(),
+      }),
+    )
+    .mutation(({ ctx, input }) => {
+      return ctx.prisma.polygonItens.create({ data: input });
+    }),
 });
