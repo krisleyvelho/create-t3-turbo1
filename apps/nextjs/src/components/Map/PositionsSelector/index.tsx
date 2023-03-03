@@ -1,10 +1,10 @@
-import { Feature,View } from "ol";
+import { Feature, View } from "ol";
 import { Point } from "ol/geom";
 import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
-import { Fill,Text } from "ol/style";
+import { Fill, Text } from "ol/style";
 import { Style } from "ol/style.js";
-import { useEffect,useState } from "react";
+import { useEffect, useState } from "react";
 import { useMapa } from "~/contexts/map";
 import { usePointers } from "~/contexts/pointer";
 import { RouterOutputs } from "~/utils/api";
@@ -82,7 +82,7 @@ export function PositionSelector() {
 
   return (
     <div className="flex flex-col">
-      <span>Selecione um local pré-definido</span>
+      <span>Selecione um ponto pré-definido</span>
 
       <select
         onChange={(e) => {

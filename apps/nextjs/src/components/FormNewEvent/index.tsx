@@ -19,11 +19,10 @@ export function FormNewEvent({ setUpdateData }: FormEventProps) {
   });
 
   return (
-    <div className="absolute bottom-0 m-auto flex w-full justify-center border-orange-400 bg-slate-600 py-8">
+    <div className="absolute bottom-0 flex w-full justify-center border-orange-400 bg-slate-600 py-8">
       <input
         type="text"
         name="name"
-        id="name"
         placeholder="name"
         className={`${
           isLoading ? "pointer-events-none cursor-wait" : ""

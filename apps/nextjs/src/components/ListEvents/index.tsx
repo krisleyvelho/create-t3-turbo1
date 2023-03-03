@@ -46,7 +46,7 @@ export function ListEvents({ setUpdateData, updateData }: ListEventsProps) {
             className={`flex flex-row justify-between gap-2 align-middle text-2xl text-white`}
             key={evento.id}
           >
-            <li>{evento.name}</li>
+            <li className="text-gray-700">{evento.name}</li>
             <div className="flex flex-row gap-3 text-lg">
               <span
                 className="flex items-center"

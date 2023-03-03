@@ -1,6 +1,5 @@
 import { Coordinate } from "ol/coordinate";
 import { useEffect, useRef, useState } from "react";
-import { LayoutBase } from "~/components/Layout";
 import { CardMap } from "~/components/Map/CardMap";
 import { MapDrawer } from "~/components/Map/MapDrawer";
 import { MapType } from "~/components/Map/MapType";
@@ -34,7 +33,7 @@ export default function Index() {
   });
 
   return (
-    <LayoutBase title="Mapa">
+    <div>
       <CustomRightClick>
         <div ref={mapRef} style={{ height: 600, width: "100%" }} />
       </CustomRightClick>
@@ -52,6 +51,6 @@ export default function Index() {
           )}
         </div>
       )}
-    </LayoutBase>
+    </div>
   );
 }

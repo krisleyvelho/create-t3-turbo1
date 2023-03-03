@@ -82,3 +82,8 @@ model PolygonItens {
     name          String
     location      String    @db.Text()
 }
+
+model JsonStorage {
+    id            String    @id @default(cuid())
+    data          Json
+}

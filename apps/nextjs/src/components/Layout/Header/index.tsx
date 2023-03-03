@@ -13,7 +13,7 @@ export function HeaderLayout({ title }: HeaderLayoutProps) {
   return (
     <div className="w-100 flex items-center justify-between bg-gray-500 p-4 text-center text-white">
       {title && (
-        <div>
+        <div className="w-100">
           <span>{title}</span>
         </div>
       )}

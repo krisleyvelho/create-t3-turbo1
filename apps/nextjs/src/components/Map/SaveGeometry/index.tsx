@@ -1,6 +1,5 @@
 import { Feature, Overlay } from "ol";
-import { FeatureLike } from "ol/Feature";
-import { MultiPoint, Polygon } from "ol/geom";
+import { Geometry, MultiPoint, Polygon } from "ol/geom";
 import { Draw } from "ol/interaction";
 import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
@@ -10,14 +9,25 @@ import { useEffect, useRef, useState } from "react";
 import { useMapa } from "~/contexts/map";
 import { api, RouterOutputs } from "~/utils/api";
 import { FormVector } from "../FormVector";
+import { NavigateGeometry } from "../NavigateGeometry";
 
-type dataType = NonNullable<RouterOutputs["polygonMap"]["byId"]>;
+/* type dataType = NonNullable<RouterOutputs["polygonMap"]["byId"]>; */
+
+type locationType = {
+  location: number[][];
+};
+
+type dataType = Omit<
+  NonNullable<RouterOutputs["polygonMap"]["byId"]>,
+  "location"
+> &
+  locationType;
 
 export function SaveGeometry() {
   const { mapa } = useMapa();
   const [canDraw, setCanDraw] = useState<boolean>(false);
   const [showGeometry, setShowGeometry] = useState<boolean>(false);
-  const [coordinatesVector, setCoordinatesVector] = useState();
+  const [coordinatesVector, setCoordinatesVector] = useState<number[]>();
   const [data, setData] = useState<dataType[]>();
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -25,8 +35,9 @@ export function SaveGeometry() {
 
   function unionVector() {
     const data: dataType[] = [];
+
     function createVector(array: number[][]) {
-      const parVector: number[][] = [];
+      const paresVector: number[][] = [];
 
       const data = array[0];
       if (data) {
@@ -34,18 +45,18 @@ export function SaveGeometry() {
           const indexPar = (index + 1) % 2 === 0;
 
           if (indexPar) {
-            parVector.push([data[index - 1] as number, item]);
+            paresVector.push([data[index - 1] as number, item]);
           }
         });
       }
-      return parVector;
+      return paresVector;
     }
 
     dbTeste?.map((itemVector) => {
       const parsedJsonLocation = JSON.parse(itemVector.location) as number[][];
 
       if (parsedJsonLocation) {
-        const newObjectVector = {
+        const newObjectVector: dataType = {
           ...itemVector,
           location: createVector(parsedJsonLocation),
         };
@@ -90,12 +101,16 @@ export function SaveGeometry() {
             }),
           }),
 
-          geometry: function (feature: FeatureLike) {
-            setCoordinatesVector(feature.getGeometry()?.flatCoordinates);
+          geometry: function (feature) {
+            const geometry: Geometry = feature.getGeometry() as Geometry;
 
-            const coordinates = feature?.getGeometry()?.getCoordinates()[0];
+            if (geometry) {
+              const coordinatesVector = geometry.flatCoordinates;
+              const coordinates = geometry?.getCoordinates()[0];
 
-            return new MultiPoint(coordinates);
+              coordinatesVector && setCoordinatesVector(coordinatesVector);
+              return new MultiPoint(coordinates);
+            }
           },
         }),
       ],
@@ -199,19 +214,26 @@ export function SaveGeometry() {
   function onSuccessRecord(operation?: string) {
     setCoordinatesVector(undefined);
     setCanDraw(false);
+
     if (!operation) {
       refetch();
     }
   }
 
   return (
-    <div className="flex flex-col">
-      <button onClick={() => setCanDraw(!canDraw)}>
-        {canDraw ? "Cancelar" : "Gravar"} geometria
-      </button>
-      <button onClick={() => setShowGeometry(!showGeometry)}>{`${
-        showGeometry ? "Esconder" : "Mostrar"
-      } Geometrias`}</button>
+    <div className="flex flex-row text-center">
+      <div className="flex flex-col">
+        <button onClick={() => setCanDraw(!canDraw)}>
+          {canDraw ? "Cancelar" : "Gravar"} geometria
+        </button>
+        <button onClick={() => setShowGeometry(!showGeometry)}>{`${
+          showGeometry ? "Esconder" : "Mostrar"
+        } todas as Geometrias`}</button>
+      </div>
+      <div>
+        <span>Selecione uma geometria</span>
+        <NavigateGeometry options={data} />
+      </div>
       <div ref={cardRef} className="absolute mt-5 min-w-[300px]">
         {coordinatesVector && (
           <FormVector
