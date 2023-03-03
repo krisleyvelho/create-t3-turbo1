@@ -35,22 +35,27 @@ export default function Index() {
   return (
     <div>
       <CustomRightClick>
-        <div ref={mapRef} style={{ height: 600, width: "100%" }} />
+        <div ref={mapRef} className="h-screen w-full px-5" />
       </CustomRightClick>
 
-      {mapa && (
-        <div className="w-100 flex flex-row justify-between gap-5 bg-slate-600 p-5 text-white">
-          <MapType />
-          <MapDrawer />
-          <CustomMousePosition />
-          <PositionSelector />
-          <CardMap />
-          <SaveGeometry />
-          {coordsClicked && (
-            <PointCreator coords={coordsClicked} setCoords={setCoordsClicked} />
-          )}
-        </div>
-      )}
+      <div className="w-100 flex flex-col flex-wrap justify-center gap-4 bg-slate-600 text-center text-white">
+        {mapa && (
+          <>
+            <MapType />
+            <MapDrawer />
+            <CustomMousePosition />
+            <PositionSelector />
+            <CardMap />
+            <SaveGeometry />
+            {coordsClicked && (
+              <PointCreator
+                coords={coordsClicked}
+                setCoords={setCoordsClicked}
+              />
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 }
